@@ -1,5 +1,5 @@
 export default class InvalidDateError extends Error {
-  constructor( message ) {
+  constructor(message) {
     super();
     this.name = 'InvalidDateError';
     this.message = message;

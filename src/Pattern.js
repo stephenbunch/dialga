@@ -27,7 +27,7 @@ export default class Pattern {
   /**
    * @param {PatternJson} [pattern]
    */
-  constructor( pattern ) {
+  constructor(pattern) {
     this.value = extend({
       start_date: null,
       end_date: null,
@@ -46,7 +46,7 @@ export default class Pattern {
    * @returns {Pattern}
    */
   validate() {
-    if ( this._validated ) {
+    if (this._validated) {
       return this;
     }
     this._validatePeriod();
@@ -62,7 +62,7 @@ export default class Pattern {
    * @param {Number} interval
    * @returns {Pattern}
    */
-  every( interval ) {
+  every(interval) {
     this._validated = false;
     this.value.interval = interval || 1;
     return this;
@@ -107,7 +107,7 @@ export default class Pattern {
    */
   month() {
     this._validated = false;
-    if ( this.value.instance ) {
+    if (this.value.instance) {
       this.value.type = TYPE.MonthNth;
     } else {
       this.value.type = TYPE.Monthly;
@@ -128,7 +128,7 @@ export default class Pattern {
    */
   year() {
     this._validated = false;
-    if ( this.value.instance ) {
+    if (this.value.instance) {
       this.value.type = TYPE.YearNth;
     } else {
       this.value.type = TYPE.Yearly;
@@ -148,7 +148,7 @@ export default class Pattern {
    * @param {Number} dayOfWeekMask
    * @returns {Pattern}
    */
-  on( dayOfWeekMask ) {
+  on(dayOfWeekMask) {
     this._validated = false;
     this.value.day_of_week_mask = dayOfWeekMask;
     this.value.instance = null;
@@ -160,7 +160,7 @@ export default class Pattern {
    * @param {Number} dayOfWeek
    * @returns {Pattern}
    */
-  the( instance, dayOfWeek ) {
+  the(instance, dayOfWeek) {
     this._validated = false;
     this.value.instance = instance;
     this.value.day_of_week_mask = dayOfWeek;
@@ -171,7 +171,7 @@ export default class Pattern {
    * @param {Number} dayOfMonth
    * @returns {Pattern}
    */
-  dayOfMonth( dayOfMonth ) {
+  dayOfMonth(dayOfMonth) {
     this._validated = false;
     this.value.instance = null;
     this.value.day_of_month = dayOfMonth;
@@ -182,7 +182,7 @@ export default class Pattern {
    * @param {String} date
    * @returns {Pattern}
    */
-  from( date ) {
+  from(date) {
     this._validated = false;
     this.value.start_date = date;
     return this;
@@ -192,7 +192,7 @@ export default class Pattern {
    * @param {String} date
    * @returns {Pattern}
    */
-  to( date ) {
+  to(date) {
     this._validated = false;
     this.value.end_date = date;
     return this;
@@ -203,14 +203,14 @@ export default class Pattern {
    * @param {String} newDate
    * @returns {Pattern}
    */
-  addException( date, newDate ) {
+  addException(date, newDate) {
     this._validated = false;
-    var exception = find( this.value.exceptions, function( exception ) {
+    var exception = find(this.value.exceptions, function(exception) {
       return exception.original_date === date;
     });
-    if ( !exception ) {
+    if (!exception) {
       exception = {};
-      this.value.exceptions.push( exception );
+      this.value.exceptions.push(exception);
     }
     exception.original_date = date;
     exception.date = newDate;
@@ -221,13 +221,13 @@ export default class Pattern {
    * @param {String} date
    * @returns {Pattern}
    */
-  removeException( date ) {
+  removeException(date) {
     this._validated = false;
-    var index = findIndex( this.value.exceptions, function( exception ) {
+    var index = findIndex(this.value.exceptions, function(exception) {
       return exception.original_date === date;
     });
-    if ( index > -1 ) {
-      this.value.exceptions.splice( index, 1 );
+    if (index > -1) {
+      this.value.exceptions.splice(index, 1);
     }
     return this;
   }
@@ -245,8 +245,8 @@ export default class Pattern {
    * @param {String} date
    * @returns {Pattern}
    */
-  findException( date ) {
-    return find( this.value.exceptions, function( exception ) {
+  findException(date) {
+    return find(this.value.exceptions, function(exception) {
       return exception.original_date === date;
     });
   }
@@ -256,24 +256,24 @@ export default class Pattern {
    * @param {String} date
    * @returns {Boolean}
    */
-  matches( date ) {
+  matches(date) {
     this.validate();
-    if ( this._exceptionsByDate[ date ] ) {
+    if (this._exceptionsByDate[date]) {
       return true;
     }
-    if ( this._moved[ date ] ) {
+    if (this._moved[date]) {
       return false;
     }
-    if ( !this._doesOccurWithinPeriod( date ) ) {
+    if (!this._doesOccurWithinPeriod(date)) {
       return false;
     }
-    switch ( this.value.type ) {
+    switch (this.value.type) {
       case TYPE.Daily:
-        return this._doesMatchDailyInterval( getDate( date ) );
+        return this._doesMatchDailyInterval(getDate(date));
       case TYPE.Weekly:
         return (
-          this._doesMatchDayOfWeek( getDate( date ) ) &&
-          this._doesMatchWeeklyInterval( getDate( date ) )
+          this._doesMatchDayOfWeek(getDate(date)) &&
+          this._doesMatchWeeklyInterval(getDate(date))
         );
       default:
         return false;
@@ -292,27 +292,27 @@ export default class Pattern {
    * @param {String} [end]
    * @returns {Mask}
    */
-  toMask( end ) {
+  toMask(end) {
     end = end || this.value.end_date;
-    if ( !end ) {
-      throw new InvalidOperationError( 'An end date is required to generate a mask.' );
+    if (!end) {
+      throw new InvalidOperationError('An end date is required to generate a mask.');
     }
     var mask = '';
     var last, next;
-    while ( next = this.next( last ) ) {
-      if ( next > end ) {
+    while (next = this.next(last)) {
+      if (next > end) {
         break;
       }
-      var days = durationToDays( getDate( next ) - getDate( last || this.value.start_date ) );
-      if ( last ) {
+      var days = durationToDays(getDate(next) - getDate(last || this.value.start_date));
+      if (last) {
         days -= 1;
       }
-      mask += repeat( '0', days );
+      mask += repeat('0', days);
       mask += '1';
       last = next;
     }
-    if ( mask ) {
-      return new Mask( Mask.trim( this.value.start_date + '|' + mask ) );
+    if (mask) {
+      return new Mask(Mask.trim(this.value.start_date + '|' + mask));
     } else {
       return new Mask();
     }
@@ -326,20 +326,20 @@ export default class Pattern {
    *   A value indicating direction. Positive goes forward, negative goes backward.
    * @returns {String|Boolean}
    */
-  next( start, direction ) {
+  next(start, direction) {
     this.validate();
-    if ( typeof start !== "string" ) {
+    if (typeof start !== "string") {
       direction = start;
-      start = getString( plusDays( getDate( this.value.start_date ), -1 ) );
+      start = getString(plusDays(getDate(this.value.start_date), -1));
     }
     var date = start;
-    while ( true ) {
-      date = getString( this._getNextOccurrence( getDate( date ), normalizeDirection( direction ) ) );
-      if ( this._doesOccurWithinPeriod( date ) ) {
+    while (true) {
+      date = getString(this._getNextOccurrence(getDate(date), normalizeDirection(direction)));
+      if (this._doesOccurWithinPeriod(date)) {
         // See if there's an exception for this date.
-        var exception = this._exceptionsByOriginalDate[ date ];
-        if ( exception ) {
-          if ( exception.date ) {
+        var exception = this._exceptionsByOriginalDate[date];
+        if (exception) {
+          if (exception.date) {
             return date;
           } else {
             // This occurence was deleted. Get the next one.
@@ -362,10 +362,10 @@ export default class Pattern {
    *   A value indicating direction. Positive goes forward, negative goes backward.
    * @returns {String|Boolean}
    */
-  nextPatternDate( start, direction ) {
+  nextPatternDate(start, direction) {
     this.validate();
-    var date = getString( this._getNextOccurrence( getDate( start ), normalizeDirection( direction ) ) );
-    if ( this._doesOccurWithinPeriod( date ) ) {
+    var date = getString(this._getNextOccurrence(getDate(start), normalizeDirection(direction)));
+    if (this._doesOccurWithinPeriod(date)) {
       return date;
     } else {
       return false;
@@ -379,32 +379,32 @@ export default class Pattern {
    *   A value indicating direction. Positive goes forward, negative goes backward.
    * @returns {String|Boolean}
    */
-  snap( date, direction ) {
+  snap(date, direction) {
     this.validate();
-    return getString( this._snapToOccurrence( getDate( date ), normalizeDirection( direction ) ) );
+    return getString(this._snapToOccurrence(getDate(date), normalizeDirection(direction)));
   }
 
   _validatePeriod() {
-    if ( !this.value.start_date ) {
-      throw new InvalidPatternError( 'A start date is required.' );
+    if (!this.value.start_date) {
+      throw new InvalidPatternError('A start date is required.');
     }
-    this.value.start_date = String( this.value.start_date );
-    validateDate( this.value.start_date );
-    if ( this.value.end_date ) {
-      this.value.end_date = String( this.value.end_date );
-      validateDate( this.value.end_date );
-      if ( this.value.start_date > this.value.end_date ) {
-        throw new InvalidPatternError( 'The end date must be greater than or equal to the start date' );
+    this.value.start_date = String(this.value.start_date);
+    validateDate(this.value.start_date);
+    if (this.value.end_date) {
+      this.value.end_date = String(this.value.end_date);
+      validateDate(this.value.end_date);
+      if (this.value.start_date > this.value.end_date) {
+        throw new InvalidPatternError('The end date must be greater than or equal to the start date');
       }
     }
   }
 
   _validateType() {
-    if ( !this.value.type ) {
-      throw new InvalidPatternError( 'A recurrence type is required.' );
+    if (!this.value.type) {
+      throw new InvalidPatternError('A recurrence type is required.');
     }
-    this.value.type = Number( this.value.type );
-    switch ( this.value.type ) {
+    this.value.type = Number(this.value.type);
+    switch (this.value.type) {
       case TYPE.Daily:
       case TYPE.Weekly:
         break;
@@ -413,17 +413,17 @@ export default class Pattern {
       case TYPE.MonthNth:
       case TYPE.Yearly:
       case TYPE.YearNth:
-        throw new NotSupportedError( '"Daily" and "Weekly" are the only recurrence types supported at this time.' );
+        throw new NotSupportedError('"Daily" and "Weekly" are the only recurrence types supported at this time.');
 
       default:
-        throw new InvalidPatternError( 'The recurrence type "' + this.value.type + '" is invalid.' );
+        throw new InvalidPatternError('The recurrence type "' + this.value.type + '" is invalid.');
     }
   }
 
   _validateDayOfWeekMask() {
-    if ( this.value.type === TYPE.Weekly ) {
-      if ( !this.value.day_of_week_mask ) {
-        throw new InvalidPatternError( 'A day-of-week mask is required for weekly recurrence patterns.' );
+    if (this.value.type === TYPE.Weekly) {
+      if (!this.value.day_of_week_mask) {
+        throw new InvalidPatternError('A day-of-week mask is required for weekly recurrence patterns.');
       }
     } else {
       this.value.day_of_week_mask = null;
@@ -431,12 +431,12 @@ export default class Pattern {
   }
 
   _validateInterval() {
-    if ( !this.value.interval ) {
-      throw new InvalidPatternError( 'A recurrence interval is required.' );
+    if (!this.value.interval) {
+      throw new InvalidPatternError('A recurrence interval is required.');
     }
-    this.value.interval = Number( this.value.interval );
-    if ( isNaN( this.value.interval ) || this.value.interval <= 0 ) {
-      throw new InvalidPatternError( 'The recurrence interval must be a number greater than 0.' );
+    this.value.interval = Number(this.value.interval);
+    if (isNaN(this.value.interval) || this.value.interval <= 0) {
+      throw new InvalidPatternError('The recurrence interval must be a number greater than 0.');
     }
   }
 
@@ -450,46 +450,46 @@ export default class Pattern {
     this._validated = true;
     var exceptions = {};
     try {
-      this.value.exceptions.forEach( function( exception ) {
-        if ( !self.matches( exception.original_date ) ) {
-          throw new InvalidPatternError( 'An exception exists for an invalid date "' + exception.original_date + '".' );
+      this.value.exceptions.forEach(function(exception) {
+        if (!self.matches(exception.original_date)) {
+          throw new InvalidPatternError('An exception exists for an invalid date "' + exception.original_date + '".');
         }
-        if ( exceptions[ exception.original_date ] ) {
-          throw new InvalidPatternError( 'More than one exception exists for "' + exception.original_date + '".' );
+        if (exceptions[exception.original_date]) {
+          throw new InvalidPatternError('More than one exception exists for "' + exception.original_date + '".');
         }
-        if ( exception.date ) {
+        if (exception.date) {
           if (
             exception.date < self.value.start_date ||
             !!self.value.end_date && exception.date > self.value.end_date
           ) {
-            throw new InvalidPatternError( 'The exception for "' + exception.original_date + '" is outside the pattern period.' );
+            throw new InvalidPatternError('The exception for "' + exception.original_date + '" is outside the pattern period.');
           }
-          if ( exception.date !== exception.original_date && self.matches( exception.date ) ) {
-            throw new InvalidPatternError( 'The exception for "' + exception.original_date + '" cannot occur on the same date as a regular occurrence."' );
+          if (exception.date !== exception.original_date && self.matches(exception.date)) {
+            throw new InvalidPatternError('The exception for "' + exception.original_date + '" cannot occur on the same date as a regular occurrence."');
           }
-          if ( exceptions[ exception.original_date ] ) {
-            throw new InvalidPatternError( 'More than one exception exists for "' + exception.original_date + '".' );
+          if (exceptions[exception.original_date]) {
+            throw new InvalidPatternError('More than one exception exists for "' + exception.original_date + '".');
           }
-          if ( exception.date <= self.nextPatternDate( exception.original_date, -1 ) ) {
-            throw new InvalidPatternError( 'The exception for "' + exception.original_date + '" must occur after the previous occurrence.' );
+          if (exception.date <= self.nextPatternDate(exception.original_date, -1)) {
+            throw new InvalidPatternError('The exception for "' + exception.original_date + '" must occur after the previous occurrence.');
           }
-          if ( exception.date >= self.nextPatternDate( exception.original_date, 1 ) ) {
-            throw new InvalidPatternError( 'The exception for "' + exception.original_date + '" must occur before the next occurrence.' );
+          if (exception.date >= self.nextPatternDate(exception.original_date, 1)) {
+            throw new InvalidPatternError('The exception for "' + exception.original_date + '" must occur before the next occurrence.');
           }
         }
-        exceptions[ exception.original_date ] = true;
+        exceptions[exception.original_date] = true;
       });
     } finally {
       this._validated = false;
     }
 
-    this.value.exceptions.forEach( function( exception ) {
-      self._exceptionsByOriginalDate[ exception.original_date ] = exception;
-      if ( exception.original_date !== exception.date ) {
-        self._moved[ exception.original_date ] = true;
+    this.value.exceptions.forEach(function(exception) {
+      self._exceptionsByOriginalDate[exception.original_date] = exception;
+      if (exception.original_date !== exception.date) {
+        self._moved[exception.original_date] = true;
       }
-      if ( exception.date ) {
-        self._exceptionsByDate[ exception.date ] = exception;
+      if (exception.date) {
+        self._exceptionsByDate[exception.date] = exception;
       }
     });
   }
@@ -499,10 +499,10 @@ export default class Pattern {
    * @param {String} date
    * @returns {Boolean}
    */
-  _doesOccurWithinPeriod( date ) {
+  _doesOccurWithinPeriod(date) {
     return (
       date >= this.value.start_date &&
-      ( !this.value.end_date || date <= this.value.end_date )
+      (!this.value.end_date || date <= this.value.end_date)
     );
   }
 
@@ -511,8 +511,8 @@ export default class Pattern {
    * @param {Date} date
    * @returns {Boolean}
    */
-  _doesMatchDayOfWeek( date ) {
-    return hasFlag( this.value.day_of_week_mask, getDayOfWeekFlag( date ) );
+  _doesMatchDayOfWeek(date) {
+    return hasFlag(this.value.day_of_week_mask, getDayOfWeekFlag(date));
   }
 
   /**
@@ -520,8 +520,8 @@ export default class Pattern {
    * @param {Date} date
    * @returns {Boolean}
    */
-  _doesMatchDailyInterval( date ) {
-    var days = durationToDays( date - getDate( this.value.start_date ) );
+  _doesMatchDailyInterval(date) {
+    var days = durationToDays(date - getDate(this.value.start_date));
     return days % this.value.interval === 0;
   }
 
@@ -530,10 +530,10 @@ export default class Pattern {
    * @param {Date} date
    * @returns {Boolean}
    */
-  _doesMatchWeeklyInterval( date ) {
-    var start = getSunday( getDate( this.value.start_date ) );
-    var end = getSunday( date );
-    var weeks = durationToWeeks( end - start );
+  _doesMatchWeeklyInterval(date) {
+    var start = getSunday(getDate(this.value.start_date));
+    var end = getSunday(date);
+    var weeks = durationToWeeks(end - start);
     return weeks % this.value.interval === 0;
   }
 
@@ -543,16 +543,16 @@ export default class Pattern {
    * @param {Number} direction A distance multiplier. Must be 1 or -1.
    * @returns {Date}
    */
-  _getNextOccurrence( start, direction ) {
-    var date = this._snapToOccurrence( start, direction );
-    if ( +date !== +start ) {
+  _getNextOccurrence(start, direction) {
+    var date = this._snapToOccurrence(start, direction);
+    if (+date !== +start) {
       return date;
     }
-    switch ( this.value.type ) {
+    switch (this.value.type) {
       case TYPE.Daily:
-        return this._getNextDailyOccurrence( date, direction );
+        return this._getNextDailyOccurrence(date, direction);
       case TYPE.Weekly:
-        return this._getNextWeeklyOccurrence( date, direction );
+        return this._getNextWeeklyOccurrence(date, direction);
     }
   }
 
@@ -562,8 +562,8 @@ export default class Pattern {
    * @param {Number} direction
    * @returns {Date}
    */
-  _getNextDailyOccurrence( date, direction ) {
-    return plusDays( date, this.value.interval * direction );
+  _getNextDailyOccurrence(date, direction) {
+    return plusDays(date, this.value.interval * direction);
   }
 
   /**
@@ -572,15 +572,15 @@ export default class Pattern {
    * @param {Number} direction
    * @returns {Date}
    */
-  _getNextWeeklyOccurrence( date, direction ) {
+  _getNextWeeklyOccurrence(date, direction) {
     do {
-      date = plusDays( date, direction );
+      date = plusDays(date, direction);
       // If it's Sunday, jump to the next valid week. If the interval is 1,
       // then we're already there.
-      if ( getDayOfWeekFlag( date ) === DAYS.Sunday ) {
-        date = plusWeeks( date, ( this.value.interval - 1 ) * direction );
+      if (getDayOfWeekFlag(date) === DAYS.Sunday) {
+        date = plusWeeks(date, (this.value.interval - 1) * direction);
       }
-    } while ( !this._doesMatchDayOfWeek( date ) );
+    } while (!this._doesMatchDayOfWeek(date));
     return date;
   }
 
@@ -590,23 +590,23 @@ export default class Pattern {
    * @param {Number} direction
    * @returns {Date}
    */
-  _snapToOccurrence( date, direction ) {
-    if ( direction > 0 ) {
-      var patternStart = getDate( this.value.start_date );
-      if ( date < patternStart ) {
+  _snapToOccurrence(date, direction) {
+    if (direction > 0) {
+      var patternStart = getDate(this.value.start_date);
+      if (date < patternStart) {
         date = patternStart;
       }
-    } else if ( this.value.end_date ) {
-      var patternEnd = getDate( this.value.end_date );
-      if ( date > patternEnd ) {
+    } else if (this.value.end_date) {
+      var patternEnd = getDate(this.value.end_date);
+      if (date > patternEnd) {
         date = patternEnd;
       }
     }
-    switch ( this.value.type ) {
+    switch (this.value.type) {
       case TYPE.Daily:
-        return this._snapToDailyOccurrence( date, direction );
+        return this._snapToDailyOccurrence(date, direction);
       case TYPE.Weekly:
-        return this._snapToWeeklyOccurrence( date, direction );
+        return this._snapToWeeklyOccurrence(date, direction);
     }
   }
 
@@ -616,10 +616,10 @@ export default class Pattern {
    * @param {Number} direction
    * @returns {Date}
    */
-  _snapToDailyOccurrence( date, direction ) {
-    var start = getDate( this.value.start_date );
-    var remainder = durationToDays( date - start ) % this.value.interval;
-    return plusDays( date, remainder * direction );
+  _snapToDailyOccurrence(date, direction) {
+    var start = getDate(this.value.start_date);
+    var remainder = durationToDays(date - start) % this.value.interval;
+    return plusDays(date, remainder * direction);
   }
 
   /**
@@ -628,41 +628,41 @@ export default class Pattern {
    * @param {Number} direction
    * @returns {Date}
    */
-  _snapToWeeklyOccurrence( date, direction ) {
-    while ( !this._doesMatchDayOfWeek( date ) ) {
-      date = plusDays( date, direction );
+  _snapToWeeklyOccurrence(date, direction) {
+    while (!this._doesMatchDayOfWeek(date)) {
+      date = plusDays(date, direction);
     }
 
-    var firstDay = getDate( this.value.start_date );
-    while ( !this._doesMatchDayOfWeek( firstDay ) ) {
-      firstDay = plusDays( firstDay, 1 );
+    var firstDay = getDate(this.value.start_date);
+    while (!this._doesMatchDayOfWeek(firstDay)) {
+      firstDay = plusDays(firstDay, 1);
     }
-    if ( date <= firstDay ) {
+    if (date <= firstDay) {
       return firstDay;
     }
 
-    if ( this.value.end_date ) {
-      var lastDay = getDate( this.value.end_date );
-      while ( !this._doesMatchDayOfWeek( lastDay ) ) {
-        lastDay = plusDays( lastDay, -1 );
+    if (this.value.end_date) {
+      var lastDay = getDate(this.value.end_date);
+      while (!this._doesMatchDayOfWeek(lastDay)) {
+        lastDay = plusDays(lastDay, -1);
       }
-      if ( date >= lastDay ) {
+      if (date >= lastDay) {
         return lastDay;
       }
     }
 
-    var remainder = durationToWeeks( getSunday( date ) - getSunday( firstDay ) ) % this.value.interval;
-    if ( remainder > 0 ) {
-      date = plusWeeks( date, remainder * direction );
-      var maskDays = dayOfWeekMaskToArray( this.value.day_of_week_mask );
-      if ( direction > 0 ) {
+    var remainder = durationToWeeks(getSunday(date) - getSunday(firstDay)) % this.value.interval;
+    if (remainder > 0) {
+      date = plusWeeks(date, remainder * direction);
+      var maskDays = dayOfWeekMaskToArray(this.value.day_of_week_mask);
+      if (direction > 0) {
         // Starting from Sunday, get the first valid date going forward from
         // Sunday to Saturday.
-        return plusDays( getSunday( date ), maskDays[0] );
+        return plusDays(getSunday(date), maskDays[0]);
       } else {
         // Starting from next Sunday, get the first valid date going backward
         // from Saturday to Sunday.
-        return plusDays( getSunday( plusWeeks( date, 1 ) ), -( 7 - maskDays[ maskDays.length - 1 ] ) );
+        return plusDays(getSunday(plusWeeks(date, 1)), -(7 - maskDays[maskDays.length - 1]));
       }
     } else {
       return date;
@@ -673,8 +673,8 @@ export default class Pattern {
 [
   'January', 'February', 'March', 'April', 'May', 'June', 'July',
   'August', 'September', 'October', 'November', 'December'
-].forEach( function( month, index ) {
-  Pattern.prototype[ month.toLowerCase() ] = function( dayOfMonth ) {
+].forEach(function(month, index) {
+  Pattern.prototype[month.toLowerCase()] = function(dayOfMonth) {
     this._validated = false;
     this.value.month_of_year = index + 1;
     this.value.day_of_month = dayOfMonth;
@@ -682,7 +682,7 @@ export default class Pattern {
     return this;
   };
 
-  Pattern.prototype[ 'of' + month ] = function( dayOfMonth ) {
+  Pattern.prototype['of' + month] = function(dayOfMonth) {
     this._validated = false;
     this.value.month_of_year = index + 1;
     this.value.day_of_month = dayOfMonth;

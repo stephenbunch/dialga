@@ -1,5 +1,5 @@
 export default class InvalidOperationError extends Error {
-  constructor( message ) {
+  constructor(message) {
     super();
     this.name = 'InvalidOperationError';
     this.message = message;
