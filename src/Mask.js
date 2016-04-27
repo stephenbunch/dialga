@@ -20,7 +20,7 @@ export default class Mask {
     this.start_date = null;
 
     if (this.value) {
-      var parts = this.value.split('|');
+      let parts = this.value.split('|');
       if (parts.length !== 2) {
         throw new InvalidMaskError('Mask is invalid. Expected format [yyyy-mm-dd]|[mask] but found "' + this.value + '".');
       }
@@ -95,12 +95,12 @@ export default class Mask {
     if (!this.value) {
       return false;
     }
-    var values = this.value.split('|');
-    var start = values[0];
+    let values = this.value.split('|');
+    let start = values[0];
     if (date < start) {
       return false;
     }
-    var index = durationToDays(getDate(date) - getDate(start));
+    let index = durationToDays(getDate(date) - getDate(start));
     return values[1][index] === '1';
   }
 
@@ -111,14 +111,14 @@ export default class Mask {
     if (!this.value) {
       return [];
     }
-    var dates = [];
-    var values = this.value.split('|');
-    var start = values[0];
+    let dates = [];
+    let values = this.value.split('|');
+    let start = values[0];
     dates.push(start);
     start = getDate(start);
-    var days = values[1].split('');
-    var length = days.length;
-    for (var i = 1; i < length; i++) {
+    let days = values[1].split('');
+    let length = days.length;
+    for (let i = 1; i < length; i++) {
       if (days[i] === '1') {
         dates.push(getString(plusDays(start, i)));
       }
@@ -133,9 +133,9 @@ export default class Mask {
     if (!this.value) {
       return null;
     }
-    var values = this.value.split('|');
-    var start = getDate(values[0]);
-    var end = plusDays(start, values[1].length - 1);
+    let values = this.value.split('|');
+    let start = getDate(values[0]);
+    let end = plusDays(start, values[1].length - 1);
     return [getString(start), getString(end)];
   }
 
@@ -177,15 +177,15 @@ export default class Mask {
   }
 
   _op(mask, op) {
-    var masks = Mask.commonalize(this.value, mask);
+    let masks = Mask.commonalize(this.value, mask);
     if (!masks[0]) {
       return new Mask();
     }
-    var a = masks[0].split('|')[1].split('');
-    var b = masks[1].split('|')[1].split('');
-    var result = [];
-    var length = a.length;
-    for (var i = 0; i < length; i++) {
+    let a = masks[0].split('|')[1].split('');
+    let b = masks[1].split('|')[1].split('');
+    let result = [];
+    let length = a.length;
+    for (let i = 0; i < length; i++) {
       result[i] = op(a[i], b[i]);
     }
     return new Mask(Mask.trim(masks[0].split('|')[0] + '|' + result.join('')), false);
@@ -200,10 +200,10 @@ export default class Mask {
       return new Mask();
     }
     dates = dates.slice().sort();
-    var start = dates[0];
-    var mask = '1';
-    var length = dates.length;
-    for (var i = 1; i < length; i++) {
+    let start = dates[0];
+    let mask = '1';
+    let length = dates.length;
+    for (let i = 1; i < length; i++) {
       mask += repeat('0', durationToDays(getDate(dates[i]) - getDate(dates[i - 1])) - 1);
       mask += '1';
     }
@@ -220,9 +220,9 @@ export default class Mask {
     if (!mask || mask.indexOf('1') === -1) {
       return '';
     } else {
-      var parts = mask.split('|');
-      var start = parts[0];
-      var value = parts[1];
+      let parts = mask.split('|');
+      let start = parts[0];
+      let value = parts[1];
       if (value.indexOf('1') === -1) {
         return '';
       } else if (value[0] === '1' && value[value.length - 1] === '1') {
@@ -246,8 +246,8 @@ export default class Mask {
   static commonalize(maskA, maskB) {
     maskA = maskA && maskA.toString();
     maskB = maskB && maskB.toString();
-    var a = !!maskA && maskA.split('|');
-    var b = !!maskB && maskB.split('|');
+    let a = !!maskA && maskA.split('|');
+    let b = !!maskB && maskB.split('|');
     if (!a && !b) {
       return ['', ''];
     }
@@ -256,7 +256,7 @@ export default class Mask {
     } else if ( !b ) {
       b = [a[0], repeat('0', a[1].length)];
     }
-    var diff;
+    let diff;
     if (a[0] < b[0]) {
       diff = durationToDays(getDate(b[0]) - getDate(a[0]));
       a[1] += repeat('0', diff);

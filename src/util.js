@@ -10,11 +10,27 @@ export function getDate(date) {
   if (!DATE_PATTERN.test(date)) {
     throw new InvalidDateError('Date "' + date + '" is invalid. Expected format to be YYYY-MM-DD.');
   }
-  var result = new Date(date + 'T00:00:00.000Z');
+  let result = new Date(date + 'T00:00:00.000Z');
   if (isNaN(result.getTime())) {
     throw new InvalidDateError('Date "' + date + '" is invalid.');
   }
   return result;
+};
+
+export function getDateFromParts(year, month, day) {
+  return getDate(`${year}-${padZero(month)}-${padZero(day)}`);
+};
+
+export function resolveDate(year, month, day) {
+  if (month > 12) {
+    year += Math.floor(month / 12);
+    month -= Math.floor(month / 12) * 12;
+  } else if (month < 1) {
+    year -= Math.ceil((month - 1) * -1 / 12);
+    month += Math.ceil((month - 1) * -1 / 12) * 12;
+  }
+  let daysInMonth = getDaysInMonth(getDateFromParts(year, month, 1));
+  return getDateFromParts(year, month, Math.min(day, daysInMonth));
 };
 
 /**
@@ -29,15 +45,46 @@ export function validateDate(date) {
  * @returns {String}
  */
 export function getString(date) {
-  var month = (date.getUTCMonth() + 1).toString();
-  if (month.length === 1) {
-    month = '0' + month;
-  }
-  var day = date.getUTCDate().toString();
-  if (day.length === 1) {
-    day = '0' + day;
-  }
+  let month = padZero(getMonth(date));
+  let day = padZero(getDayOfMonth(date));
   return date.getUTCFullYear() + '-' + month + '-' + day;
+};
+
+export function padZero(value) {
+  value = value.toString();
+  if (value.length === 1) {
+    value = '0' + value;
+  }
+  return value;
+};
+
+export function getMonth(date) {
+  return date.getUTCMonth() + 1;
+};
+
+export function getDayOfMonth(date) {
+  return date.getUTCDate();
+};
+
+export function getYear(date) {
+  return date.getUTCFullYear();
+};
+
+export function getDaysInMonth(date) {
+  let year = getYear(date);
+  let month = getMonth(date) + 1;
+  if (month > 12) {
+    month = 1;
+    year += 1;
+  }
+  date = getDate(`${year}-${padZero(month)}-01`);
+  date = plusDays(date, -1);
+  return getDayOfMonth(date);
+};
+
+export function getFirstDayOfMonth(date) {
+  let [year, month, day] = getString(date).split('-');
+  return getDate(`${year}-${month}-01`);
 };
 
 /**
@@ -100,6 +147,28 @@ export function durationToWeeks(duration) {
   return durationToDays(duration) / 7;
 };
 
+export function getMonthsBetween(start, end) {
+  if (start > end) {
+    let temp = end;
+    end = start;
+    start = temp;
+  }
+  let startYear = getYear(start);
+  let startMonth = getMonth(start);
+  let endYear = getYear(end);
+  let endMonth = getMonth(end);
+  let years = endYear - startYear;
+  let months = 0;
+  if (endMonth > startMonth) {
+    months = endMonth - startMonth;
+  } else if (endMonth < startMonth) {
+    months = startMonth - endMonth;
+    years -= 1;
+  }
+  months += years * 12;
+  return months;
+};
+
 /**
  * @param {Number} days
  * @returns {Number}
@@ -131,8 +200,8 @@ export function plusWeeks(date, weeks) {
  * @returns {Array.<Number>}
  */
 export function dayOfWeekMaskToArray(mask) {
-  var days = [0, 1, 2, 3, 4, 5, 6];
-  var result = [];
+  let days = [0, 1, 2, 3, 4, 5, 6];
+  let result = [];
   days.forEach(function(day) {
     if (hasFlag(mask, dayOfWeekToFlag(day))) {
       result.push(day);
@@ -145,19 +214,8 @@ export function normalizeDirection(direction) {
   return direction < 0 ? -1 : 1;
 };
 
-export function extend(target, obj) {
-  var prop;
-  obj = obj || {};
-  for (prop in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-      target[prop] = obj[prop];
-    }
-  }
-  return target;
-};
-
 export function find(array, callback) {
-  var index = findIndex(array, callback);
+  let index = findIndex(array, callback);
   if (index > -1) {
     return array[index];
   } else {
@@ -166,7 +224,7 @@ export function find(array, callback) {
 };
 
 export function findIndex(array, callback) {
-  for (var i = 0; i < array.length; i++) {
+  for (let i = 0; i < array.length; i++) {
     if (callback(array[i])) {
       return i;
     }
@@ -175,8 +233,8 @@ export function findIndex(array, callback) {
 };
 
 export function repeat(string, times) {
-  var ret = '';
-  for (var i = 0; i < times; i++) {
+  let ret = '';
+  for (let i = 0; i < times; i++) {
     ret += string;
   }
   return ret;

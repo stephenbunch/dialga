@@ -7,7 +7,6 @@ import InvalidDateError from './errors/InvalidDateError';
 import InvalidMaskError from './errors/InvalidMaskError';
 import InvalidOperationError from './errors/InvalidOperationError';
 import InvalidPatternError from './errors/InvalidPatternError';
-import NotSupportedError from './errors/NotSupportedError';
 
 var exports = function() {
   return new Pattern();
@@ -23,7 +22,6 @@ exports.errors = {
   InvalidMaskError,
   InvalidOperationError,
   InvalidPatternError,
-  NotSupportedError
 };
 
 export default exports;
