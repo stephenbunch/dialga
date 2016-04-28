@@ -212,6 +212,10 @@ export function getMonthsBetween(start, end) {
   return months;
 };
 
+export function getYearsBetween(start, end) {
+  return Math.abs(getYear(end) - getYear(start));
+};
+
 /**
  * @param {Number} days
  * @returns {Number}
