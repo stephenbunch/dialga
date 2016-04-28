@@ -1,6 +1,7 @@
 import TYPE from './type';
 
 import {
+  dayOfWeekFromFlag,
   durationToDays,
   find,
   findIndex,
@@ -418,9 +419,18 @@ export default class Pattern {
   }
 
   _validateDayOfWeekMask() {
-    if (this.value.type === TYPE.Weekly) {
+    if (
+      this.value.type === TYPE.Weekly ||
+      this.value.type === TYPE.MonthNth ||
+      this.value.type === TYPE.YearNth
+    ) {
       if (!this.value.day_of_week_mask) {
-        throw new InvalidPatternError('A day-of-week mask is required for weekly recurrence patterns.');
+        throw new InvalidPatternError('A day of week mask is required for Weekly, MonthNth, and YearNth recurrence patterns.');
+      }
+      if (this.value.type === TYPE.MonthNth || this.value.type === TYPE.YearNth) {
+        if (dayOfWeekFromFlag(this.value.day_of_week_mask) % 1 !== 0) {
+          throw new InvalidPatternError('Only one day of week may be specified for MonthNth and YearNth recurrence patterns.');
+        }
       }
     } else {
       this.value.day_of_week_mask = null;

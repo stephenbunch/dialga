@@ -17,20 +17,54 @@ export function getDate(date) {
   return result;
 };
 
+/**
+ * Creates a date object from the specified year/month/day.
+ * @param {Number} year
+ * @param {Number} month
+ * @param {Number} day
+ * @returns {Date}
+ */
 export function getDateFromParts(year, month, day) {
   return getDate(`${year}-${padZero(month)}-${padZero(day)}`);
 };
 
+/**
+ * Creates a date object from the specified year/month/day. If day is too high,
+ * the last day of the month is used.
+ * @param {Number} year
+ * @param {Number} month [1-12]
+ * @param {Number} day [1-31]
+ * @returns {Date}
+ */
 export function resolveDate(year, month, day) {
-  if (month > 12) {
-    year += Math.floor(month / 12);
-    month -= Math.floor(month / 12) * 12;
-  } else if (month < 1) {
-    year -= Math.ceil((month - 1) * -1 / 12);
-    month += Math.ceil((month - 1) * -1 / 12) * 12;
-  }
   let daysInMonth = getDaysInMonth(getDateFromParts(year, month, 1));
   return getDateFromParts(year, month, Math.min(day, daysInMonth));
+};
+
+export function getInstance(date) {
+  return Math.ceil(getDayOfMonth(date) / 7);
+};
+
+/**
+ * @param {Number} year
+ * @param {Number} month
+ * @param {Number} instance [1-5]
+ * @param {Number} dayOfWeek [0-6]
+ * @returns {Date}
+ */
+export function resolveInstanceDate(year, month, instance, dayOfWeek) {
+  let day0 = getDateFromParts(year, month, 1);
+  let dow0 = getDayOfWeek(day0);
+  if (dayOfWeek < dow0) {
+    dayOfWeek += 7;
+  }
+  let firstInstance = 1 + dayOfWeek - dow0;
+  let day = firstInstance + (instance - 1) * 7;
+  let daysInMonth = getDaysInMonth(day0);
+  if (day > daysInMonth) {
+    day -= 7;
+  }
+  return getDateFromParts(year, month, day);
 };
 
 /**
@@ -88,6 +122,7 @@ export function getFirstDayOfMonth(date) {
 };
 
 /**
+ * 0-6 Sunday-Saturday.
  * @param {Date} date
  * @returns {Number}
  */
@@ -109,6 +144,14 @@ export function getDayOfWeekFlag(date) {
  */
 export function dayOfWeekToFlag(day) {
   return Math.pow(2, day);
+};
+
+/**
+ * @param {Number} flag
+ * @returns {Number}
+ */
+export function dayOfWeekFromFlag(flag) {
+  return Math.log(flag) / Math.log(2);
 };
 
 /**
