@@ -1,5 +1,4 @@
 import {
-  getDate,
   getMonth,
   getMonthsBetween,
   getYear,

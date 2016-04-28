@@ -549,15 +549,20 @@ export default class Pattern {
   Pattern.prototype[month.toLowerCase()] = function(dayOfMonth) {
     this._validated = false;
     this.value.month_of_year = index + 1;
-    this.value.day_of_month = dayOfMonth;
-    this.value.instance = null;
+    if (dayOfMonth) {
+      this.value.day_of_month = dayOfMonth;
+      this.value.instance = null;
+    }
     return this;
   };
 
   Pattern.prototype['of' + month] = function(dayOfMonth) {
     this._validated = false;
     this.value.month_of_year = index + 1;
-    this.value.day_of_month = dayOfMonth;
+    if (dayOfMonth) {
+      this.value.day_of_month = dayOfMonth;
+      this.value.instance = null;
+    }
     return this;
   };
 });

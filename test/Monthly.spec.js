@@ -21,8 +21,8 @@ describe('Monthly', function() {
   describe('.next(date, direction)', function() {
     it('should return the next date in the series', function() {
       let pattern = recur().day(4).every(3).months().from('2016-01-12');
-      expect(pattern.next()).to.equal('2016-02-04');
-      expect(pattern.next('2016-02-04')).to.equal('2016-05-04');
+      expect(pattern.next()).to.equal('2016-04-04');
+      expect(pattern.next('2016-04-04')).to.equal('2016-07-04');
     });
   });
 

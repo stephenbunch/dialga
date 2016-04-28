@@ -1,6 +1,6 @@
 import recur from '../src';
 
-describe('Monthly', function() {
+describe('Yearly', function() {
   describe('.matches(date)', function() {
     it('should return false if the date matches the wrong day of the year', function() {
       let pattern = recur().february(5).every().year().from('2016-01-01');

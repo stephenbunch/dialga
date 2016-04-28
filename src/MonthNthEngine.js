@@ -1,11 +1,8 @@
 import {
   dayOfWeekFromFlag,
-  getDate,
   getDayOfWeek,
   getInstance,
-  getMonth,
   getMonthsBetween,
-  getYear,
   resolveInstanceDate,
 } from './util';
 

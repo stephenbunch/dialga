@@ -15,7 +15,7 @@ export default class MonthEngine {
     let month = getMonth(patternStart);
     let firstOccurrence = this._resolveDate(year, month);
     if (firstOccurrence < patternStart) {
-      firstOccurrence = this._resolveDate(year, month + 1);
+      firstOccurrence = this._resolveDate(year, month + interval);
     }
     this.firstOccurrence = firstOccurrence;
 
@@ -61,7 +61,7 @@ export default class MonthEngine {
    */
   _getOccurrenceUntil(date) {
     if (date < this.firstOccurrence) {
-      date = this.firstOccurrence;
+      return this.firstOccurrence;
     }
     let months = Math.floor(getMonthsBetween(this.firstOccurrence, date) / this._interval) * this._interval;
     let occurrence = this._resolveDate(getYear(this.firstOccurrence), getMonth(this.firstOccurrence) + months);
